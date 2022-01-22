@@ -1,0 +1,66 @@
+[
+  {
+    "role": "Bartender",
+    "location": {
+      "description": "Richmond Road",
+      "type": "Point",
+      "coordinates": [-0.055387, 51.543339],
+      "address": "London, SE81 9AK"
+    },
+    "earning": "14",
+    "duration": 5,
+    "startingDate": "19 December",
+    "description": "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Delectus expedita culpa perferendis earumanimi repudiandae illo rem est harum nisi? Lorem ipsum dolor sit, amet consectetur ! ",
+    "images": ["img-1", "img-2", "img-3"],
+    "ratingsAverage": 4.7,
+    "ratingsQuantity": 37
+  },
+  {
+    "role": "Waiter/Waitress",
+    "location": {
+      "description": "Kingsway",
+      "type": "Point",
+      "coordinates": [-0.118922, 51.515434],
+      "address": "29 Kingsway, N80 7GV"
+    },
+    "earning": "11",
+    "duration": 1,
+    "startingDate": "19 December",
+    "description": "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Delectus expedita culpa perferendis earumanimi repudiandae illo rem est harum nisi? Lorem ipsum dolor sit, amet consectetur !",
+    "images": ["img-1", "img-2", "img-3"],
+    "ratingsAverage": 4.2,
+    "ratingsQuantity": 32
+  },
+  {
+    "role": "Barista",
+    "location": {
+      "description": "Stanley Road",
+      "type": "Point",
+      "coordinates": [0.016809, 51.59859],
+      "address": "75 Stanley Road, WC29 0HF"
+    },
+    "earning": "10/12",
+    "duration": 3,
+    "startingDate": "1 January",
+    "description": "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Delectus expedita culpa perferendis earumanimi repudiandae illo rem est harum nisi? Lorem ipsum dolor sit, amet consectetur ! ",
+    "images": ["img-1", "img-2", "img-3"],
+    "ratingsAverage": 3.9,
+    "ratingsQuantity": 11
+  },
+  {
+    "role": "Wine Waiter",
+    "location": {
+      "description": "Park Avenue",
+      "type": "Point",
+      "coordinates": [-0.185721, 51.503135],
+      "address": "153 Park Avenue, N73 8PK"
+    },
+    "earning": "10/12",
+    "duration": 3,
+    "startingDate": "1 January",
+    "description": "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Delectus expedita culpa perferendis earumanimi repudiandae illo rem est harum nisi? Lorem ipsum dolor sit, amet consectetur ! ",
+    "images": ["img-1", "img-2", "img-3"],
+    "ratingsAverage": 4.4,
+    "ratingsQuantity": 32
+  }
+]
