@@ -7,7 +7,7 @@ const trainingSchema = new mongoose.Schema(
       type: String,
       required: [true, 'A training must have a role'],
       trim: true,
-      maxlength: [20, 'A training role must be at most 20 characters'],
+      maxlength: [30, 'A training role must be at most 20 characters'],
       minlength: [3, 'A training role have at least 3 characters'],
     },
     location: {
@@ -78,6 +78,16 @@ const trainingSchema = new mongoose.Schema(
 trainingSchema.pre('save', function (next) {
   this.slug = slugify(this.role, { lower: true });
   next();
+});
+
+//In order as the virtual field to be shown has to be populate in the mongo query
+trainingSchema.virtual('reviews', {
+  // Review.training=Training._id
+  ref: 'Review',
+  //FOREIGN FIELD -> This is the name of the field in the other model
+  foreignField: 'training',
+  //LOCAL Field -> so this local field _id is called training is the foreign field model
+  localField: '_id',
 });
 
 const Training = mongoose.model('Training', trainingSchema);

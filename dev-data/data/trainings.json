@@ -1,6 +1,7 @@
 [
   {
-    "role": "Bartender",
+    "_id": "61edf84d6d420c97f8ecd415",
+    "role": "A masterclass in cocktails",
     "location": {
       "description": "Richmond Road",
       "type": "Point",
@@ -10,12 +11,14 @@
     "earning": "14",
     "duration": 5,
     "startingDate": "19 December",
-    "description": "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Delectus expedita culpa perferendis earumanimi repudiandae illo rem est harum nisi? Lorem ipsum dolor sit, amet consectetur ! ",
+    "description": "Accumsan quam gravida fames libero lobortis. Vivamus sapien feugiat dapibus morbi inceptos vivamus primis pulvinar. Sagittis viverra pretium fringilla nec ullamcorper posuere nisi quisque felis porttitor etiam posuere.",
     "images": ["img-1", "img-2", "img-3"],
     "ratingsAverage": 4.7,
     "ratingsQuantity": 37
   },
+
   {
+    "_id": "61edf84d6d420c97f8ecd416",
     "role": "Waiter/Waitress",
     "location": {
       "description": "Kingsway",
@@ -31,7 +34,9 @@
     "ratingsAverage": 4.2,
     "ratingsQuantity": 32
   },
+
   {
+    "_id": "61edf84d6d420c97f8ecd417",
     "role": "Barista",
     "location": {
       "description": "Stanley Road",
@@ -42,12 +47,14 @@
     "earning": "10/12",
     "duration": 3,
     "startingDate": "1 January",
-    "description": "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Delectus expedita culpa perferendis earumanimi repudiandae illo rem est harum nisi? Lorem ipsum dolor sit, amet consectetur ! ",
+    "description": "Lorem rutrum ullamcorper amet nostra enim faucibus urna curabitur vehicula massa phasellus sollicitudin ante urna. Viverra duis vulputate hendrerit posuere per primis proin. Volutpat litora hendrerit ipsum rhoncus et nibh amet urna.",
     "images": ["img-1", "img-2", "img-3"],
     "ratingsAverage": 3.9,
     "ratingsQuantity": 11
   },
+
   {
+    "_id": "61edf84d6d420c97f8ecd418",
     "role": "Wine Waiter",
     "location": {
       "description": "Park Avenue",
@@ -58,9 +65,27 @@
     "earning": "10/12",
     "duration": 3,
     "startingDate": "1 January",
-    "description": "Lorem ipsum dolor, sit amet consectetur adipisicing elit.Delectus expedita culpa perferendis earumanimi repudiandae illo rem est harum nisi? Lorem ipsum dolor sit, amet consectetur ! ",
+    "description": "Mattis finibus urna morbi platea ligula class auctor donec egestas volutpat in. At cursus quam malesuada imperdiet ultrices inceptos tempus ullamcorper vitae pretium lorem curabitur consectetur eu maecenas.",
     "images": ["img-1", "img-2", "img-3"],
     "ratingsAverage": 4.4,
     "ratingsQuantity": 32
+  },
+
+  {
+    "_id": "61edf84d6d420c97f8ecd419",
+    "role": "Bartender Course",
+    "location": {
+      "description": "East Central London",
+      "type": "Point",
+      "coordinates": [-0.130829, 51.507398],
+      "address": "59 Victoria Street, EC97 6MW"
+    },
+    "earning": "10/12",
+    "duration": 3,
+    "startingDate": "1 January",
+    "description": "Lorem rutrum ullamcorper amet nostra enim faucibus urna curabitur vehicula massa phasellus sollicitudin ante urna. Viverra duis vulputate hendrerit posuere per primis proin. Volutpat litora hendrerit ipsum rhoncus et nibh amet urna.",
+    "images": ["img-1", "img-2", "img-3"],
+    "ratingsAverage": 3.9,
+    "ratingsQuantity": 11
   }
 ]

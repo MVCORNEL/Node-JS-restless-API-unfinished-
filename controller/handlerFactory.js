@@ -2,9 +2,14 @@ const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
 const ApiFeatures = require('./../utils/apiFeatures');
 
-exports.getOne = (Model) => {
+exports.getOne = (Model, populateOption) => {
   return catchAsync(async (req, res, next) => {
-    const document = await Model.findById(req.params.id);
+    const mongoQuery = Model.findById(req.params.id);
+    if (populateOption) {
+      mongoQuery.populate('reviews');
+    }
+
+    const document = await mongoQuery;
 
     if (!document) {
       //also return immediately, because otherwise will try to send 2 responses back
@@ -35,7 +40,7 @@ exports.createOne = (Model) => {
 
 exports.deleteOne = (Model) => {
   return catchAsync(async (req, res, next) => {
-    const deletedDocument = await Model.findByIdAndDelete(req.body);
+    const deletedDocument = await Model.findByIdAndDelete(req.body.id);
     if (!deletedDocument) {
       //also return immediately, because otherwise will try to send 2 responses back
       return next(new AppError('No document found with such an ID', 404));
