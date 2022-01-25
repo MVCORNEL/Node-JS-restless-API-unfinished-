@@ -40,7 +40,7 @@ exports.createOne = (Model) => {
 
 exports.deleteOne = (Model) => {
   return catchAsync(async (req, res, next) => {
-    const deletedDocument = await Model.findByIdAndDelete(req.body.id);
+    const deletedDocument = await Model.findByIdAndDelete(req.params.id);
     if (!deletedDocument) {
       //also return immediately, because otherwise will try to send 2 responses back
       return next(new AppError('No document found with such an ID', 404));

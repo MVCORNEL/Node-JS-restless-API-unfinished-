@@ -52,7 +52,7 @@
   {
     "_id": "61edf84d6d420c97f8ecd119",
     "review": "Aliquam tempor vulputate cursus duis eros odio. Potenti orci at ad erat non magna dignissim platea donec ultrices fermentum morbi diam morbi.",
-    "rating": 3,
+    "rating": 4,
     "training": "61edf84d6d420c97f8ecd417"
   },
   {
@@ -71,7 +71,7 @@
   {
     "_id": "61edf84d6d420c97f8ecd122",
     "review": "Elit viverra purus fames aenean porttitor integer aptent. Auctor vel turpis ornare ut aliquet mi bibendum magna facilisis tellus volutpat nisl mollis.",
-    "rating": 3,
+    "rating": 4,
     "training": "61edf84d6d420c97f8ecd418"
   },
   {
@@ -83,7 +83,7 @@
   {
     "_id": "61edf84d6d420c97f8ecd124",
     "review": "Scelerisque porta primis amet commodo id feugiat lorem gravida gravida convallis tristique dui aliquet vivamus sit. Habitant dolor lacinia blandit faucibus torquent neque odio.",
-    "rating": 5,
+    "rating": 3,
     "training": "61edf84d6d420c97f8ecd418"
   },
 
@@ -96,7 +96,7 @@
   {
     "_id": "61edf84d6d420c97f8ecd126",
     "review": "Vel rutrum bibendum quam velit inceptos etiam proin elementum dignissim. Orci vivamus dignissim lacus dui pharetra curae sodales posuere tempor fames tincidunt bibendum ultrices.",
-    "rating": 4,
+    "rating": 3,
     "training": "61edf84d6d420c97f8ecd419"
   },
   {
