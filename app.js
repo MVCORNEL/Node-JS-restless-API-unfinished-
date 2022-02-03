@@ -2,6 +2,7 @@ const dotenv = require('dotenv');
 const express = require('express');
 const trainingRouter = require('./routes/trainingRouter');
 const reviewRouter = require('./routes/reviewRouter');
+const userRouter = require('./routes/userRouter');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controller/errorController');
 
@@ -16,6 +17,7 @@ app.use(express.json({ limit: '10kb' }));
 //CREATE ROTUES MIDDLEWARE
 app.use('/api/v1/trainings', trainingRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/users', userRouter);
 
 //All unhandled routes
 app.all('*', (req, res, next) => {

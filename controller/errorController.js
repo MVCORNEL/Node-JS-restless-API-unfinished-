@@ -48,6 +48,10 @@ const handleValidationErrorDB = (err) => {
   const message = `Invalid input dataset. ${errors.join('. ')}`;
   return new AppError(message, 400);
 };
+//4
+const handleJWTError = () => new AppError('Invalid token please try again', 401);
+//5
+const handleJWTExpiredError = () => new AppError('Your token has expried', 401);
 
 //GLOBAL ERROR HANDLER - Express out of box error handler middleware (to define it give the function 4 arguments first will be always the error
 module.exports = (err, req, res, next) => {
@@ -74,6 +78,8 @@ module.exports = (err, req, res, next) => {
     //3 VALIDATION ERROR -> (Mongoose ERROR)
     if (err.name === 'ValidationError') error = handleValidationErrorDB(error);
 
+    if (err.name === 'JsonWebTokenError') error = handleJWTError(error);
+    if (err.name === 'TokenExpiredError') error = handleJWTExpiredError(error);
     //If the codiotion aboce are not met, a generic non operational error will be send
     sendErrorProd(error, res);
   }
