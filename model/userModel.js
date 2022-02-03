@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
 const bcrypt = require('bcryptjs');
+const crypto = require('crypto');
 
 const userSchema = mongoose.Schema({
   name: {
@@ -35,6 +36,9 @@ const userSchema = mongoose.Schema({
   },
 
   passwordChangedAt: Date,
+
+  passwordResetToken: String,
+  passwordResetTokenExpires: Date,
 });
 
 //1 PASSWORD ENCRYPTION
@@ -58,6 +62,21 @@ userSchema.pre('save', async function (next) {
   next();
 });
 
+//CHANGE passwordChangedAtProperty but only when be modified the password property (not when a new doc is created)
+userSchema.pre('save', async function (next) {
+  //When we create a new document we did actually modify the password, that why we have to use isNew() on mongoose documentation
+  if (!this.isModified('password') || this.isNew) {
+    return next();
+  }
+  //VERY IMPORTANT !!
+  //The problem here is sometimes saving the data is a bit slower and sometimes is saved after the JSON WEB TOKEN has been created
+  //That will make it sometimes that the user will not be able to log in using the new token
+  //Sometimes happens that this that the JWT token is created a bit before the changedPasswordTimeStamp
+  //We can foix that by substractig one second, SO that will put the the passWordChange time one second in the past(not 100% accurate) but doesn;t matter at all
+  this.passwordChangedAt = Date.now() - 1000;
+  next();
+});
+
 //INSTANCE METHODS is a method that will be available for all the documents of a certain collection
 //candidate password is the password that the user passes in the body
 //user password is the password within the database (already encrypted)
@@ -66,23 +85,31 @@ userSchema.methods.isPasswordCorrect = async function (candidatePassword, userPa
   return await bcrypt.compare(candidatePassword, userPassword);
 };
 
-//Check of the password was changed after the JWT was issued
+//CHECK IF PASSWORD WAS CHANGED AFTER TOEKN WAS ISSUED
 userSchema.methods.isPasswordChangedAfterJWTIssued = function (JWTTimestamp) {
   //this always points to the current document in the an instance method
   //1 Check if the password has been ever changed -> 10 meaning the digits base
-
-  //2 Check if user changed password after JWT issued (each payload havign its own iat on payload time of ISSUED AT TIME in seconds)
-  console.log('IAT', JWTTimestamp);
-  console.log('PASS CHANGED', parseInt(this.passwordChangedAt.getTime() / 1000));
-
+  // Check if user changed password after JWT issued (each payload havign its own iat on payload time of ISSUED AT TIME in seconds)
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
 
     return 1643825850 > JWTTimestamp;
   }
-
-  //3 If the password was not changed
+  //2 If the password was not changed
   return false;
+};
+
+//CREATE PASSWORD RESET TOKEN THAT WILL BE SEND TO THE USER, THIS TOKEN WILL
+userSchema.methods.createPasswordResetToken = function () {
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  //NEVER STORE A PLAIN RESET TOKEN INTO THE DB
+  //Encrypt the random generated code, and attach it to the document -> this is done in the controller
+  this.passwordResetToken = crypto.createHash('sha256').update(resetToken).digest('hex');
+  //10 minutes
+  this.passwordResetTokenExpires = Date.now() + 1000 * 60 * 10;
+  //Return the token, but not the encrypted one, this will be the token that will be sent through the email
+
+  return resetToken;
 };
 
 module.exports = mongoose.model('User', userSchema);

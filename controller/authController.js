@@ -3,6 +3,7 @@ const AppError = require('./../utils/appError');
 const User = require('./../model/userModel');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
+const crypto = require('crypto');
 
 //In the JWT token the payload will be always the id used by the user to access it accoutn details and to access protected routes
 const signInToken = (id) => {
@@ -39,7 +40,7 @@ exports.login = catchAsync(async (req, res, next) => {
   //1 Check if email and password are inserted
   const { email, password } = req.body;
   if (!email || !password) {
-    return next(new AppError('Please provide email and password'));
+    return next(new AppError('Please provide email and password', 400));
   }
 
   //2 Select the user based on email and password field that is set to not be seen in our projection
@@ -69,7 +70,7 @@ exports.protected = catchAsync(async (req, res, next) => {
   }
   if (!token) {
     //UNAUTHORIZED
-    return next(new AppError('You are not logged in! Please log in to get access'));
+    return next(new AppError('You are not logged in! Please log in to get access', 401));
   }
 
   //2 Verification step for the token (Verifycate if somebody modified the data or if the token already expired)
@@ -83,7 +84,7 @@ exports.protected = catchAsync(async (req, res, next) => {
   }
 
   if (user.isPasswordChangedAfterJWTIssued(decodedPayload.iat)) {
-    return next(new AppError('User recently changed password! Please log in again'));
+    return next(new AppError('User recently changed password! Please log in again', 401));
   }
 
   req.user = user;
@@ -101,3 +102,73 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.forgotPassword = catchAsync(async (req, res, next) => {
+  if (!req.body.email) {
+    //400 BAD REQUEST
+    return next(new AppError('Please insert an email address', 400));
+  }
+  //1 GET THE USER BASED ON THE POSTED EMAIL
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    //404 NOT FOUND
+    return next(new AppError('There is no user with this email address', 404));
+  }
+  //2 GENERATE THE RANDOM RESET TOKEN
+  const resetToken = user.createPasswordResetToken();
+  console.log(resetToken);
+  //3 UPADATE THE USER WITH THE NEW FILDS (passwordResetToken passwordResetTokenExpires) -> that are attached to the document by using methods at step 2
+  //DEACTIVATE VALIDATION Here we won't have any longer the passworConfirmation on the document, so the validation won't pass ->
+  await user.save({ validateBeforeSave: false });
+  //4 SEND TOKEN TO THE USER
+  //NOT IMPLEMENTED YET
+  const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+  const message = `Forgot your Password? Submit a PATCH requset with your new password and passwordConfirm to: ${resetUrl} \n If you didn't forget your password, please ignore this email !`;
+  //WE WANT TO DO MORE THAN SENDING AN ERROR DOWN TO THE CLIENT THAT IS WHY TRY CATCH
+  try {
+    //TODO
+    //SEND EMAIL FUNCTIONALITY
+    res.status(200).json({
+      status: 'success',
+      //We send the token through and email address and never here, because we assume the email is a safe place, where only the user has access
+      message: `Test must delete after because not safe ${message}`,
+    });
+  } catch (error) {
+    //IN THE CASE SOMETHIGN WENT WRONG, WE DON'T WANT THE TOKEN AND ITS DATA ON DB
+    user.passwordResetToken = undefined;
+    user.passwordResetTokenExpires = undefined;
+    //false because the confirm password is not on the doc anylonger
+    await user.save({ validateBeforeSave: false }); //save the changes to passwordResetToken passwordResetTokenExpires
+  }
+});
+
+exports.resetPassword = catchAsync(async (req, res, next) => {
+  //1 GET THE USER BASED ON THE RESET TOKEN (THE TOKEN SENT TO THE USER IS NOT ECRYPTED WHILE THE ONE WHITHN THE DB IS ECNRYPTED)
+  console.log(req.params.token);
+  const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
+
+  //We need to check if the RESET TOKEN has expried and if the is a user
+  const user = await User.findOne({ passwordResetToken: hashedToken, passwordResetTokenExpires: { $gt: Date.now() } });
+
+  //2 If the token has not expired and there is user, set the new password
+  if (!user) {
+    //400 BAD REQUEST
+    return next(new AppError('Token is invalid or has expried', 400));
+  }
+
+  //3 PUT THE NEW PASSWORD DETAILS THAT ARE ON THE REQ OBJECT ON THE, ON THE CURRENT DB DOCUMENT
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  user.passwordResetToken = undefined;
+  user.passwordResetTokenExpired = undefined;
+  //In this case we don't have to turn of the validators, because we want to validate if the pass is the same with the confirm password
+  //This is the reason we want to use save and not update to run the pass and passConfirm validation
+  await user.save();
+  //Send token to user
+  const token = signInToken(user._id);
+
+  res.status(200).json({
+    status: ' success',
+    token,
+  });
+});
