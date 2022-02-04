@@ -97,7 +97,7 @@ userSchema.methods.isPasswordChangedAfterJWTIssued = function (JWTTimestamp) {
   if (this.passwordChangedAt) {
     const changedTimestamp = parseInt(this.passwordChangedAt.getTime() / 1000, 10);
 
-    return 1643825850 > JWTTimestamp;
+    return changedTimestamp > JWTTimestamp;
   }
   //2 If the password was not changed
   return false;

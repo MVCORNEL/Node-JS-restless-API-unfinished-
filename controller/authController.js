@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const crypto = require('crypto');
 const Email = require('./../utils/email');
+const { off } = require('process');
 
 //In the JWT token the payload will be always the id used by the user to access it accoutn details and to access protected routes
 const signInToken = (id) => {
@@ -68,6 +69,7 @@ exports.login = catchAsync(async (req, res, next) => {
     data: { user },
   });
 });
+
 //PROTECTED
 exports.protected = catchAsync(async (req, res, next) => {
   //1 GETTING THE TOKEN
@@ -179,6 +181,40 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 
   res.status(200).json({
     status: ' success',
+    token,
+  });
+});
+
+//UPDATE current user password
+exports.updateMyPassword = catchAsync(async (req, res, next) => {
+  //1 MAKE SURE THE USER INSERTED THE CURRENT PASS
+  if (!req.body.passwordCurrent) {
+    return next(new AppError('Please insert your current password', 401));
+  }
+
+  //2 FIRST GET THE USER FROM COLLECTION
+  //At this point we will have the user data coming from the protect middleware, because we need protected rights to access this route
+  //Select the password cause by default not included in the projection
+  const user = await User.findById(req.user._id).select('+password');
+
+  //3 CHECK IF THE POSTED CURRENT PASSWORD IN CORRECT -> compare with the one stored in DB
+  if (!(await user.isPasswordCorrect(req.body.passwordCurrent, user.password))) {
+    return next(new AppError('Your current password is wrong', 401));
+  }
+
+  //4 SAVE THE NEW PASSWORD (VALIDATORS WILL RUN)
+  //WHY NOT findByIdAndUpdate
+  //1 We havent done User.findByIdAndUpdate because the passwordConfirm validation is not going to worl, because of validator function. because this.password is not defined
+  //when we update because by default Mongoose is not really hoing to keep the current object in memory
+  //2 Also the 2 presave middleware are not going to work, in this case the password won;t be encrypted and also the passwordChangeAt stamp won't be set3
+  user.password = req.body.password;
+  user.passwordConfirm = req.body.passwordConfirm;
+  await user.save();
+
+  const token = signInToken(user._id);
+
+  res.status(200).json({
+    status: 'success',
     token,
   });
 });
