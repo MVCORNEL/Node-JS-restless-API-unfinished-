@@ -4,6 +4,7 @@ const User = require('./../model/userModel');
 const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const crypto = require('crypto');
+const Email = require('./../utils/email');
 
 //In the JWT token the payload will be always the id used by the user to access it accoutn details and to access protected routes
 const signInToken = (id) => {
@@ -16,18 +17,23 @@ const signInToken = (id) => {
   );
 };
 
+//SIGNUP
 exports.signup = catchAsync(async (req, res, next) => {
   //The reason why the full body object is passed, is becase that will produce a huge security flaw, because the user can specifi his role as admin. an gettit the controller
   const newUser = await User.create({
-    name: req.body.name,
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
     email: req.body.email,
     password: req.body.password,
     passwordConfirm: req.body.passwordConfirm,
     passwordChangedAt: Date.now(),
   });
 
-  //CREATE JWT TOKEN
+  //1 CREATE JWT TOKEN
   const token = signInToken(newUser._id);
+
+  //2 SEND WELCOME EMAIL
+  await new Email(newUser).sendWelcome();
 
   res.status(201).json({
     //ALL
@@ -36,6 +42,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 });
 
+//LOGIN
 exports.login = catchAsync(async (req, res, next) => {
   //1 Check if email and password are inserted
   const { email, password } = req.body;
@@ -61,7 +68,7 @@ exports.login = catchAsync(async (req, res, next) => {
     data: { user },
   });
 });
-
+//PROTECTED
 exports.protected = catchAsync(async (req, res, next) => {
   //1 GETTING THE TOKEN
   let token;
@@ -91,6 +98,7 @@ exports.protected = catchAsync(async (req, res, next) => {
   next();
 });
 
+//RESTRICT TO
 exports.restrictTo = (...roles) => {
   //this functin will have access to previous variables due to closures
   //in this way we can pass a varaible even if we have a a method signature
@@ -122,16 +130,16 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   await user.save({ validateBeforeSave: false });
   //4 SEND TOKEN TO THE USER
   //NOT IMPLEMENTED YET
-  const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
-  const message = `Forgot your Password? Submit a PATCH requset with your new password and passwordConfirm to: ${resetUrl} \n If you didn't forget your password, please ignore this email !`;
+
   //WE WANT TO DO MORE THAN SENDING AN ERROR DOWN TO THE CLIENT THAT IS WHY TRY CATCH
   try {
-    //TODO
-    //SEND EMAIL FUNCTIONALITY
+    const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/users/resetPassword/${resetToken}`;
+
+    await new Email(user, resetUrl).sendPasswordReset();
+
     res.status(200).json({
       status: 'success',
       //We send the token through and email address and never here, because we assume the email is a safe place, where only the user has access
-      message: `Test must delete after because not safe ${message}`,
     });
   } catch (error) {
     //IN THE CASE SOMETHIGN WENT WRONG, WE DON'T WANT THE TOKEN AND ITS DATA ON DB
@@ -139,6 +147,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
     user.passwordResetTokenExpires = undefined;
     //false because the confirm password is not on the doc anylonger
     await user.save({ validateBeforeSave: false }); //save the changes to passwordResetToken passwordResetTokenExpires
+    return next(new AppError('There was an error sending the email. Try again later!'), 500);
   }
 });
 
@@ -164,6 +173,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   //In this case we don't have to turn of the validators, because we want to validate if the pass is the same with the confirm password
   //This is the reason we want to use save and not update to run the pass and passConfirm validation
   await user.save();
+
   //Send token to user
   const token = signInToken(user._id);
 

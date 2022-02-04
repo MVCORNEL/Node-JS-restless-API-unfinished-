@@ -4,10 +4,14 @@ const bcrypt = require('bcryptjs');
 const crypto = require('crypto');
 
 const userSchema = mongoose.Schema({
-  name: {
+  firstName: {
     type: String,
-    requried: [true, 'Please tell us your name'],
-    maxlength: 50,
+    required: [true, 'Please tell us your first name!'],
+  },
+
+  lastName: {
+    type: String,
+    requried: [true, 'Please tell us your last name!'],
   },
 
   email: {
@@ -108,7 +112,6 @@ userSchema.methods.createPasswordResetToken = function () {
   //10 minutes
   this.passwordResetTokenExpires = Date.now() + 1000 * 60 * 10;
   //Return the token, but not the encrypted one, this will be the token that will be sent through the email
-
   return resetToken;
 };
 
