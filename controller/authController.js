@@ -218,3 +218,43 @@ exports.updateMyPassword = catchAsync(async (req, res, next) => {
     token,
   });
 });
+
+const filterObject = (object, ...allowedFields) => {
+  //easiest way to loop through an object ks
+  const newObj = {};
+  Object.keys(object).forEach((el) => {
+    if (allowedFields.includes(el)) {
+      newObj[el] = object[el];
+    }
+  });
+  return newObj;
+};
+
+//UPDATE CURRENT USER DATA
+exports.updateMe = catchAsync(async (req, res, next) => {
+  //1 Create error if user POSTS password data
+
+  if (req.body.password || req.body.passwordConfirm) {
+    //400 bad request
+    return next(new AppError('This route is not for password updates. Please use /updateMyPassword', 400));
+  }
+
+  //2 FILTER DATA THAT WE DON'T WANT TO UPDATE (in case the user)
+  //Update user document -> cannot use User.save because we won't fill the password, and password validations will run
+  //One of the reason is we still need the email and name validators to run compered with save with validators off
+  //We don't want to update everything that is within the body like body.role: 'admin'
+  const filteredBody = filterObject(req.body, 'firstName', 'lastName', 'email');
+
+  console.log(filteredBody);
+  const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
+    new: true,
+    runValidators: true,
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      user: updatedUser,
+    },
+  });
+});

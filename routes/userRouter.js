@@ -6,6 +6,7 @@ const {
   forgotPassword,
   resetPassword,
   updateMyPassword,
+  updateMe,
   protected,
 } = require('./../controller/authController');
 
@@ -18,5 +19,6 @@ router.patch('/resetPassword/:token', resetPassword);
 
 //CURRENT USER
 router.patch('/updateMyPassword', protected, updateMyPassword);
+router.patch('/updateMe', protected, updateMe);
 
 module.exports = router;
