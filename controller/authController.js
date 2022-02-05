@@ -258,3 +258,13 @@ exports.updateMe = catchAsync(async (req, res, next) => {
     },
   });
 });
+
+//DELETE ME -deactive the current user
+//Show only active user when user queries are done
+exports.deleteMe = catchAsync(async (req, res, next) => {
+  await User.findByIdAndUpdate(req.user._id, { active: false });
+  res.status(204).json({
+    status: 'success',
+    data: 'null',
+  });
+});

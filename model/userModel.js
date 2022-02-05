@@ -40,9 +40,23 @@ const userSchema = mongoose.Schema({
   },
 
   passwordChangedAt: Date,
-
   passwordResetToken: String,
   passwordResetTokenExpires: Date,
+
+  active: {
+    type: Boolean,
+    default: true,
+    //won't be projected
+    select: false,
+  },
+});
+
+//HIDE DEACTIVATED FIELDS
+//shows only the active suers, for any type of queries
+userSchema.pre('/^find/', function (next) {
+  //this points to the current query
+  this.find({ active: { $ne: false } });
+  next();
 });
 
 //1 PASSWORD ENCRYPTION
