@@ -66,28 +66,27 @@ const trainingSchema = new mongoose.Schema(
 
     slug: String,
   },
-  //SCHEMA OPTIONS
   {
+    //Each the that the data is outputted as JSON we awnt virtuals to be TRUE
     toJSON: { virtuals: true },
     toObject: { virtuals: true },
   }
 );
+
+//VIRTUAL POPULATE
+trainingSchema.virtual('reviews', {
+  ref: 'Review',
+  //FOREIGN FIELD -> This is the name of the field in the other model, so in the review model in this case where the reference to the current model is
+  foreignField: 'training',
+  //LOCAL FIELD -> so this local field _id is called tour in the foregin field model
+  localField: '_id',
+});
 
 //PRE SAVE MIDDLEWARE -> runs for save() and create() but not for insertMany(), before the doc is saved to DB
 //this points to the current document
 trainingSchema.pre('save', function (next) {
   this.slug = slugify(this.role, { lower: true });
   next();
-});
-
-//In order as the virtual field to be shown has to be populate in the mongo query
-trainingSchema.virtual('reviews', {
-  // Review.training=Training._id
-  ref: 'Review',
-  //FOREIGN FIELD -> This is the name of the field in the other model
-  foreignField: 'training',
-  //LOCAL Field -> so this local field _id is called training is the foreign field model
-  localField: '_id',
 });
 
 const Training = mongoose.model('Training', trainingSchema);

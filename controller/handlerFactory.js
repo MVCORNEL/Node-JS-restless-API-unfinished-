@@ -5,8 +5,9 @@ const ApiFeatures = require('./../utils/apiFeatures');
 exports.getOne = (Model, populateOption) => {
   return catchAsync(async (req, res, next) => {
     const mongoQuery = Model.findById(req.params.id);
+
     if (populateOption) {
-      mongoQuery.populate('reviews');
+      mongoQuery.populate(populateOption);
     }
 
     const document = await mongoQuery;

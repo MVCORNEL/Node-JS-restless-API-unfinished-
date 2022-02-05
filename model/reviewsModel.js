@@ -26,6 +26,11 @@ const reviewSchema = mongoose.Schema(
       ref: 'Training',
       required: [true, 'Review must depend on a training'],
     },
+    user: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: [true, 'Review must depend on a user'],
+    },
   },
   //SCHEMA OPTIONS
   {
@@ -35,6 +40,16 @@ const reviewSchema = mongoose.Schema(
     toObject: { virtuals: true },
   }
 );
+
+//Populate the user into the review
+reviewSchema.pre(/^find/, function (next) {
+  this.populate({
+    path: 'user',
+    select: 'firstName lastName email photo',
+  });
+
+  next();
+});
 
 //STATIC METHOD used to calculate the averages
 reviewSchema.statics.calcAverageRatings = async function (trainingId) {
@@ -85,7 +100,6 @@ reviewSchema.pre(/^findOneAnd/, async function (next) {
   //will pass the id of this clone query to the next
   //We also have to save the document otherwise we won't have access to the static method
   this.result = await this.clone().findOne();
-
   next();
 });
 //Calculate the document avgereges after the doc was saved, otherwise it won't be pu to date

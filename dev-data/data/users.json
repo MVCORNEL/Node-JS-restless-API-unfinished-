@@ -1,0 +1,69 @@
+[
+  {
+    "_id": "61fdb027fc4b31c67ad4f865",
+    "firstName": "Bobo",
+    "lastName": "Manea",
+    "email": "zippy@mailsac.com",
+    "photo": "default.jpg",
+    "role": "user",
+    "password": "$2a$12$mNdRxQ2o8eu9XqpVAZaEvuKXEv7Wyrp/WYvqKbRTTXu3CKkt1d40K",
+    "passwordChangedAt": { "$date": "2022-02-05T01:19:23.444Z" },
+    "__v": 0,
+    "active": false
+  },
+  {
+    "_id": "61febb32e4c72c97fd09f7e4",
+    "firstName": "Ioana",
+    "lastName": "Alexandra",
+    "email": "ioana@mailsac.com",
+    "photo": "default.jpg",
+    "role": "user",
+    "password": "$2a$12$3.Au5knVbzWvnzkUSu0NyuPQbLYKmDgMRRG6RziVawCf/P0u9ep1m",
+    "active": true,
+    "__v": 0
+  },
+  {
+    "_id": "61fecb24da14bbe499d8b823",
+    "firstName": "Radu",
+    "lastName": "Manea",
+    "email": "radu@mailsac.com",
+    "photo": "default.jpg",
+    "role": "user",
+    "password": "$2a$12$Z.aXzeagjj/2vJXtxDnt/.XYoJ64qpECg/oBJEFoDppo/3naWYoam",
+    "active": true,
+    "__v": 0
+  },
+  {
+    "_id": "61fecb33da14bbe499d8b825",
+    "firstName": "Nicu",
+    "lastName": "Anca",
+    "email": "nicu@mailsac.com",
+    "photo": "default.jpg",
+    "role": "user",
+    "password": "$2a$12$w63ZnwoTlHVOKXYOvFi6mOswA2lnt7wiT8bF94zwsiXiifGlwMWPK",
+    "active": true,
+    "__v": 0
+  },
+  {
+    "_id": "61fecb42da14bbe499d8b827",
+    "firstName": "Kristof",
+    "lastName": "Selectz",
+    "email": "kristof@mailsac.com",
+    "photo": "default.jpg",
+    "role": "user",
+    "password": "$2a$12$yQjMQkeQ0m1JIWLGZP1ASev.VBY1F6MTz1pN2ydF9BnBtXWryynBi",
+    "active": true,
+    "__v": 0
+  },
+  {
+    "_id": "61fecb50da14bbe499d8b829",
+    "firstName": "David",
+    "lastName": "Bacter",
+    "email": "bacter@mailsac.com",
+    "photo": "default.jpg",
+    "role": "user",
+    "password": "$2a$12$kB1E6xPP5TchQhu3Z.1h..EkJtN7u4cmuLozcHGhXzzv0TQA3LHFa",
+    "active": true,
+    "__v": 0
+  }
+]

@@ -3,6 +3,7 @@ const fs = require('fs');
 const dotenv = require('dotenv');
 const Training = require('./../../model/trainingModel');
 const Review = require('./../../model/reviewsModel');
+const User = require('./../../model/userModel');
 
 //Environment variables, config
 //Must be run before the app file code
@@ -18,11 +19,13 @@ mongoose.connect(DB).then((conn) => {
 //READ JSON FILE
 const trainings = JSON.parse(fs.readFileSync(`${__dirname}/trainings.json`, 'utf-8'));
 const reviews = JSON.parse(fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8'));
+const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
 
 const importData = async () => {
   try {
     await Training.create(trainings);
     await Review.create(reviews);
+    await User.create(users, { validateBeforeSave: false });
     console.log('Data successfully loaded');
     process.exit();
   } catch (err) {
@@ -34,6 +37,7 @@ const deleteData = async () => {
   try {
     await Training.deleteMany();
     await Review.deleteMany();
+    await User.deleteMany();
     process.exit();
   } catch (err) {
     console.log(err);

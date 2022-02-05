@@ -86,6 +86,7 @@ userSchema.pre('save', async function (next) {
   if (!this.isModified('password') || this.isNew) {
     return next();
   }
+
   //VERY IMPORTANT !!
   //The problem here is sometimes saving the data is a bit slower and sometimes is saved after the JSON WEB TOKEN has been created
   //That will make it sometimes that the user will not be able to log in using the new token
