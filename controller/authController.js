@@ -5,7 +5,6 @@ const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const crypto = require('crypto');
 const Email = require('./../utils/email');
-const { off } = require('process');
 
 //In the JWT token the payload will be always the id used by the user to access it accoutn details and to access protected routes
 const signInToken = (id) => {

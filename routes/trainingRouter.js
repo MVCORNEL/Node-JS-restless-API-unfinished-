@@ -13,7 +13,6 @@ const reviewRouter = require('./reviewRouter');
 const trainingRouter = express.Router();
 
 //NESTED ROUTES => The current router should use the reviews router in case ever encounter a route like this
-
 trainingRouter.use('/:trainingId/reviews', reviewRouter);
 
 //Mounting the router
