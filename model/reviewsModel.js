@@ -41,6 +41,9 @@ const reviewSchema = mongoose.Schema(
   }
 );
 
+//Preventing a user having more reviews on a tour
+reviewSchema.index({ training: 1, user: 1 }, { unique: true });
+
 //Populate the user into the review
 reviewSchema.pre(/^find/, function (next) {
   this.populate({

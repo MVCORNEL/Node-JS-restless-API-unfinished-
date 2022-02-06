@@ -38,7 +38,13 @@ const handleCastErrorDB = (err) => {
 };
 //2
 const handleDuplicateFieldsDS = (err) => {
-  const message = `Duplicare field value: ${err.keyValue?.name}, Please use another value`;
+  let message;
+  console.log(err);
+  if ('training' in err.keyPattern && 'review' in err.keyPattern) {
+    message = `Duplicate review on same training, Please use another value`;
+  } else {
+  }
+  message = `Duplicate field value: ${Object.keys(err.keyValue).join('-')}. Please use another value`;
   return new AppError(message, 400);
 };
 //3
@@ -77,7 +83,6 @@ module.exports = (err, req, res, next) => {
     if (err.code === 11000) error = handleDuplicateFieldsDS(error);
     //3 VALIDATION ERROR -> (Mongoose ERROR)
     if (err.name === 'ValidationError') error = handleValidationErrorDB(error);
-
     if (err.name === 'JsonWebTokenError') error = handleJWTError(error);
     if (err.name === 'TokenExpiredError') error = handleJWTExpiredError(error);
     //If the codiotion aboce are not met, a generic non operational error will be send
