@@ -47,7 +47,6 @@ reviewSchema.pre(/^find/, function (next) {
     path: 'user',
     select: 'firstName lastName email photo',
   });
-
   next();
 });
 

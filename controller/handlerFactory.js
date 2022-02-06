@@ -74,9 +74,14 @@ exports.updateOne = (Model) => {
   });
 };
 
+//Extra filter will be fore extrq query, coming from nestes review router->
+//where we wany to get only the reviews coming from a specific training/ that specific training
+//Extra query To allow for nested GET reviews on training (only the reviews of a training)
 exports.getAll = (Model) => {
   return catchAsync(async (req, res, next) => {
-    const mongooseQuery = Model.find();
+    //A small hack alawing another way of filtering the data
+    let filter = req.extraFilter || {};
+    const mongooseQuery = Model.find(filter);
     const expressQuery = req.query;
     //mongoose query is processed within the ApiFeatures class
     const apiQuery = new ApiFeatures(mongooseQuery, expressQuery).filter().sort().limitFields().paginate();
