@@ -10,6 +10,8 @@ const {
   deleteMe,
   protected,
   restrictTo,
+  uploadUserPhoto,
+  resizeUserPhoto,
 } = require('./../controller/authController');
 
 const router = express.Router();
@@ -22,7 +24,7 @@ router.patch('/resetPassword/:token', resetPassword);
 router.use(protected);
 //CURRENT USER
 router.patch('/updateMyPassword', updateMyPassword);
-router.patch('/updateMe', updateMe);
+router.patch('/updateMe', uploadUserPhoto, resizeUserPhoto, updateMe);
 router.delete('/deleteMe', deleteMe);
 
 router.use(restrictTo('admin'));

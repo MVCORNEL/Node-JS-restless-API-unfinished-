@@ -5,7 +5,10 @@ const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const crypto = require('crypto');
 const Email = require('./../utils/email');
+const multer = require('multer');
+const sharp = require('sharp');
 
+//1 TOKEN
 //In the JWT token the payload will be always the id used by the user to access it accoutn details and to access protected routes
 const signInToken = (id) => {
   return jwt.sign(
@@ -17,7 +20,7 @@ const signInToken = (id) => {
   );
 };
 
-//SIGNUP
+//2 SIGNUP
 exports.signup = catchAsync(async (req, res, next) => {
   //The reason why the full body object is passed, is becase that will produce a huge security flaw, because the user can specifi his role as admin. an gettit the controller
   const newUser = await User.create({
@@ -41,7 +44,7 @@ exports.signup = catchAsync(async (req, res, next) => {
   });
 });
 
-//LOGIN
+//3 LOGIN
 exports.login = catchAsync(async (req, res, next) => {
   //1 Check if email and password are inserted
   const { email, password } = req.body;
@@ -68,7 +71,7 @@ exports.login = catchAsync(async (req, res, next) => {
   });
 });
 
-//PROTECTED
+//4 PROTECTED
 exports.protected = catchAsync(async (req, res, next) => {
   //1 GETTING THE TOKEN
   let token;
@@ -98,7 +101,7 @@ exports.protected = catchAsync(async (req, res, next) => {
   next();
 });
 
-//RESTRICT TO
+//5 RESTRICT TO
 exports.restrictTo = (...roles) => {
   //this functin will have access to previous variables due to closures
   //in this way we can pass a varaible even if we have a a method signature
@@ -111,6 +114,7 @@ exports.restrictTo = (...roles) => {
   };
 };
 
+//6 FORGOT PASSWORD
 exports.forgotPassword = catchAsync(async (req, res, next) => {
   if (!req.body.email) {
     //400 BAD REQUEST
@@ -151,6 +155,7 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
 });
 
+//7 RESET PASSWORD
 exports.resetPassword = catchAsync(async (req, res, next) => {
   //1 GET THE USER BASED ON THE RESET TOKEN (THE TOKEN SENT TO THE USER IS NOT ECRYPTED WHILE THE ONE WHITHN THE DB IS ECNRYPTED)
   console.log(req.params.token);
@@ -183,6 +188,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
   });
 });
 
+//8 UPDATE CURRENT PASSWORD
 //UPDATE current user password
 exports.updateMyPassword = catchAsync(async (req, res, next) => {
   //1 MAKE SURE THE USER INSERTED THE CURRENT PASS
@@ -217,6 +223,7 @@ exports.updateMyPassword = catchAsync(async (req, res, next) => {
   });
 });
 
+//9 Filter Object
 const filterObject = (object, ...allowedFields) => {
   //easiest way to loop through an object ks
   const newObj = {};
@@ -228,10 +235,43 @@ const filterObject = (object, ...allowedFields) => {
   return newObj;
 };
 
-//UPDATE CURRENT USER DATA
-exports.updateMe = catchAsync(async (req, res, next) => {
-  //1 Create error if user POSTS password data
+//MULTER - UPLOAD IMAGE
+//Save the file within the memory first, stored as a buffer
+const multerStorage = multer.memoryStorage();
+//This function the goal is to test if the uploaded file is an image, if it is we pass true into the cb function oterwise we pass false into the callback function along with an error
+const multerFilter = (req, file, cb) => {
+  //no matter if it is a JPEG,PNG or a BITMAP or a TIFF, the mimetype will always start with the image
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new AppError('Not a image! Please upload only images, 400'), false);
+  }
+};
 
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
+exports.uploadUserPhoto = upload.single('photo');
+
+//RESIZE IMAGES
+exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
+  //if no file return
+  if (!req.file) return next();
+  //We need the filename in the next middleware function, in updateMe -> when we save the filename in the database
+  //We can use jpeg now becayse we covner the file in jpeg already with sharp
+  req.file.filename = `user-${req.user.id}.jpeg`;
+  //Instaed of having to write the file to the disk, we basicallty keep the image in the memory
+  //this operations is asynchronous so we need to use async in order to not block the user loop
+  await sharp(req.file.buffer)
+    .resize(500, 500)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/users/${req.file.filename}`);
+  next();
+});
+
+//10 UPDATE ME
+exports.updateMe = catchAsync(async (req, res, next) => {
+  console.log(req.file);
+  //1 Create error if user POSTS password data
   if (req.body.password || req.body.passwordConfirm) {
     //400 bad request
     return next(new AppError('This route is not for password updates. Please use /updateMyPassword', 400));
@@ -243,7 +283,9 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   //We don't want to update everything that is within the body like body.role: 'admin'
   const filteredBody = filterObject(req.body, 'firstName', 'lastName', 'email');
 
-  console.log(filteredBody);
+  //3 Attach the photo object to the user doc
+  if (req.file) filteredBody.photo = req.file.filename;
+
   const updatedUser = await User.findByIdAndUpdate(req.user._id, filteredBody, {
     new: true,
     runValidators: true,
@@ -257,7 +299,7 @@ exports.updateMe = catchAsync(async (req, res, next) => {
   });
 });
 
-//DELETE ME -deactive the current user
+//11 DELETE ME -deactive the current user
 //Show only active user when user queries are done
 exports.deleteMe = catchAsync(async (req, res, next) => {
   await User.findByIdAndUpdate(req.user._id, { active: false });

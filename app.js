@@ -14,6 +14,10 @@ const app = express();
 
 //Body parser put data coming form the user on req object
 app.use(express.json({ limit: '10kb' }));
+// //The way that the form sends data to the userver is also called urlencoded
+// //extended: true //allows us to pass some more complex data(not really necessary in our case)
+// app.use(express.urlencoded({ extended: true, limit: '10kb' }));
+
 //CREATE ROTUES MIDDLEWARE
 app.use('/api/v1/trainings', trainingRouter);
 app.use('/api/v1/reviews', reviewRouter);
