@@ -5,7 +5,7 @@ const jwt = require('jsonwebtoken');
 const { promisify } = require('util');
 const crypto = require('crypto');
 const Email = require('./../utils/email');
-const multer = require('multer');
+const upload = require('./../utils/multer');
 const sharp = require('sharp');
 
 //1 TOKEN
@@ -128,7 +128,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
   }
   //2 GENERATE THE RANDOM RESET TOKEN
   const resetToken = user.createPasswordResetToken();
-  console.log(resetToken);
   //3 UPADATE THE USER WITH THE NEW FILDS (passwordResetToken passwordResetTokenExpires) -> that are attached to the document by using methods at step 2
   //DEACTIVATE VALIDATION Here we won't have any longer the passworConfirmation on the document, so the validation won't pass ->
   await user.save({ validateBeforeSave: false });
@@ -158,7 +157,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 //7 RESET PASSWORD
 exports.resetPassword = catchAsync(async (req, res, next) => {
   //1 GET THE USER BASED ON THE RESET TOKEN (THE TOKEN SENT TO THE USER IS NOT ECRYPTED WHILE THE ONE WHITHN THE DB IS ECNRYPTED)
-  console.log(req.params.token);
   const hashedToken = crypto.createHash('sha256').update(req.params.token).digest('hex');
 
   //We need to check if the RESET TOKEN has expried and if the is a user
@@ -235,20 +233,6 @@ const filterObject = (object, ...allowedFields) => {
   return newObj;
 };
 
-//MULTER - UPLOAD IMAGE
-//Save the file within the memory first, stored as a buffer
-const multerStorage = multer.memoryStorage();
-//This function the goal is to test if the uploaded file is an image, if it is we pass true into the cb function oterwise we pass false into the callback function along with an error
-const multerFilter = (req, file, cb) => {
-  //no matter if it is a JPEG,PNG or a BITMAP or a TIFF, the mimetype will always start with the image
-  if (file.mimetype.startsWith('image')) {
-    cb(null, true);
-  } else {
-    cb(new AppError('Not a image! Please upload only images, 400'), false);
-  }
-};
-
-const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
 exports.uploadUserPhoto = upload.single('photo');
 
 //RESIZE IMAGES
@@ -270,7 +254,6 @@ exports.resizeUserPhoto = catchAsync(async (req, res, next) => {
 
 //10 UPDATE ME
 exports.updateMe = catchAsync(async (req, res, next) => {
-  console.log(req.file);
   //1 Create error if user POSTS password data
   if (req.body.password || req.body.passwordConfirm) {
     //400 bad request

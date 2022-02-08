@@ -5,6 +5,8 @@ const {
   getTraining,
   updateTraining,
   deleteTraining,
+  uploadTrainingImages,
+  resizeTrainingImages,
 } = require('../controller/trainingHandler');
 const { protected, restrictTo } = require('./../controller/authController');
 //NESTED ROUTES MERGE PARAM -> in this case the parameters coming from the tour will show on the review too
@@ -17,6 +19,10 @@ trainingRouter.use('/:trainingId/reviews', reviewRouter);
 
 //Mounting the router
 trainingRouter.route('/').get(getAllTrainings).post(protected, restrictTo('admin'), createTraining);
-trainingRouter.route('/:id').get(getTraining).patch(updateTraining).delete(deleteTraining);
+trainingRouter
+  .route('/:id')
+  .get(getTraining)
+  .patch(protected, restrictTo('admin'), uploadTrainingImages, resizeTrainingImages, updateTraining)
+  .delete(deleteTraining);
 
 module.exports = trainingRouter;
